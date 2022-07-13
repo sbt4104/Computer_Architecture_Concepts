@@ -1,0 +1,97 @@
+# Pipelining
+
+- How to make out processors faster?
+1] increase the size of the bus (transfer more data)
+2] increase the frequency of the clock (increase the speed of data transfer)
+3] INTRODUCE PIPELINE
+
+- What is Pipelining?
+Pipelining is simple words a method of performing multiple operations parallely
+this way we do not keep anything idle in our system ans everything has a purpose
+
+This is how any instruction is processed and executed
+FETCH -> DECODE -> EXECUTE -> SAVE
+
+1] Data is fetched from the memory (using the bus brought in the processor and stored in a register)
+2] the binary data stored in previous step is deciphered based on OP-CODE & other instructions etc.
+3] Based on the instructions in previous step we perform the excuction (may use the registered in processor or fo to main memory to fetch extra details)
+4] Result is stored for future.
+
+how execution will look in a vanilla non pipeline mode?
+F1 E1 | F2 E2 | F3 E3 | F4 E4 | F4 E4  (Lets focus only on Fetch and Execute to begin)
+
+So, If there are 5 instructions it will take 5*2 = 10 cycles
+
+Lets introduce pipeline!!
+F1 E1 | 
+   F2 E2 | 
+      F3 E3 | 
+         F4 E4 | 
+            F4 E4 |
+               ......
+
+I think we can see the difference now.
+While the previous instruction is being executed we fetch the next instruction.
+(while the execution of !st instruction is happening our buses are idle, lets put them to some work and fetch the next instruction in Memory)
+
+so, Virually our Execution will look like this
+F1 E1 E2 E3 E4 E5...
+
+So, If there are 5 instructions it will take 1+5 = 6 cycles. (without pipelining it would be 5*2=10)
+
+- what is 3 stage pipelining, or 5 stage .... or n-stage pipelining?
+in the previous example we saw only Fetch & Execute, now lets break it down further
+Fetch -> Decode -> Execute -> SAVE
+
+Use Pipelining for 5 set instruction
+F1 D1 E1 S1 |
+   F2 D2 E2 S2 |
+      F3 D3 E3 S3 |
+         F4 D4 E4 S4 |
+            F5 D5 E5 S5
+
+So, Virtually it will look like
+F1, D1, E1, S1, S2, S3, S4, S5
+So now it looks as if we are only saving the final result after fetching, decoding & executing the first instruction.
+
+So, If there are 5 instructions it will take 1+1+1+5 = 8 cycles. (without pipelining it would be 4*5=20)
+
+We are completing 3 operation in parallel along with previous instruction (3 stage pipeline)
+
+now divide your execution into even smaller tasks ans you get the n-stage pipeline.
+
+- What if we put 2 pipeline parallely (nake our machines even bigger and fast!!) ?
+Lets say we have 2 pipes llely
+PIPE1           PIPE2
+I1      ->         I2
+I3      ->         I4
+I5      ->         I6
+I7      ->         I8
+
+This is nothing but those fancy cores in you CPU that everyone is so proud of (including me!!).
+
+
+BUT wait....
+
+Is it all gold and glittery? are there drawbacks?
+Yes, obviously there are. otherwise people would have created 100-stage , 100000...000-stage pipeline. but thats not the case.
+Lets see why it doesn't happen.
+
+1] control hazard - when first instructing is executing, we fetch the 2nd one. now lets just imagine that there is a branch after 1st
+and we have to go to 7th instruction. Due to which we now have to disregard the already fetched 2nd instruction and fetch the 7th one.
+This creates a gap in out pipelining, we call it a bubble. a pipeline bubble.
+- How to solve it? There is a concept called branch prediction which supposedely gives a successful predictionof more than 90%.
+
+2] Data hazard - Lets say we are executing 1st instructing and 2nd is fetched. but the catch is that 2nd instruction requires a variable 
+which 1st is using and it made some changes to it. now what?
+The data fetched as 2nd instruction might just be something stale and useless.
+- How to solve it? We use NOP. we put a no operaion statement after every instruction and wait some time before 2 is fectched.
+
+3] Structural hazard - Everything works nicely algorithmically, but there is a very huge structural issue.
+We use the busses to fetch and send the data. now lets say that 1st instruction is being executed and we are just going to fetch the
+2nd one, but the execution of 1st instruction requires some data which is not there in registers and need to be fetched from the memory.
+What now? our processor will end up choosing either one of them at a time, which in turn make the other wait for the bus to be free.
+- How to solve it? Use a havard architecture (instructions & data store in different locations - more buses to run) instead of von neuman architecture(instructions and data in the same place- only one set of busses).
+
+More to be added soon.
+=====================
